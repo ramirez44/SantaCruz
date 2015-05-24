@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_layoutSantaCruz.cshtml";
+}
+
+@if (null == ViewBag.Uid)
+{
+    <h1>You did not pass a UID!</h1>
+    <p>FFFFFFUUUUUUUUUUUUUUUUUUU</p>
+    <p><img src="http://i0.kym-cdn.com/entries/icons/original/000/000/063/Picture_2_c.jpg" /></p>
+}
+else
+{
+    <h1>The UID is @ViewBag.Uid</h1>
+    <p>Congratulations! Here's some BBQ.</p>
+    <p><img src="http://cdn2.bigcommerce.com/server1400/ac7d3/product_images/uploaded_images/bbq-texas01.jpg" /></p>
+}

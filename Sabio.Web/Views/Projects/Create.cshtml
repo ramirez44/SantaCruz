@@ -1,0 +1,346 @@
+﻿@model Sabio.Web.Models.ViewModels.ItemViewModel<Guid?>
+@{
+    Layout = "~/Views/Shared/_layoutSantaCruz.cshtml";
+}
+
+
+
+<div data-ng-controller="createProjectsController as dashboard" id="createProjectsCtrler">
+
+
+    <form role="form" name="projectForm" class="form-horizontal" @*id="formCreateProject"*@ ng-submit="submitForm(projectForm.$valid)" novalidate>
+        <div class="form-group">
+                Project Name: <input type="text" placeholder="Enter a Project Name" ng-model="dashboard.project.name" />
+        </div>
+        <div class="form-group">
+                Website: <input type="text" placeholder="Enter a Website" ng-model="dashboard.project.url" />
+        </div>
+        <div class="form-group">
+                Description: <input type="text" placeholder="Enter a Description" ng-model="dashboard.project.description" />
+        </div>
+        <div class="form-group">
+                Date Launched: <input type="text" placeholder="Date Launched" ng-model="dashboard.project.launchdate" />
+        </div>
+
+        <label>Technologies</label>
+        <div class="form-group">
+            <label class="checkbox-inline">
+                <input type="checkbox" name="tecnologies" ng-model="dashboard.tecnologies.asp"> ASP.Net
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="tecnologies" ng-model="dashboard.tecnologies.sql"> SQL
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="tecnologies" ng-model="dashboard.tecnologies.csharp"> C#
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="tecnologies" ng-model="dashboard.tecnologies.html"> HTML
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="tecnologies" ng-model="dashboard.tecnologies.jscript"> Javascript
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="tecnologies" ng-model="dashboard.tecnologies.css"> CSS
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="tecnologies" ng-model="dashboard.tecnologies.jquery"> Jquery
+            </label>
+            <label class="checkbox-inline">
+                <input type="checkbox" name="tecnologies" ng-model="dashboard.tecnologies.angular"> Angular
+            </label>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+
+
+                <input type="submit" class="btn btn-default" ng-click="dashboard.submissionbutton()" value="submit">
+
+                    @*<button class="btn btn-default" type="submit" id="submissionButton">Submit</button>*@
+</div>
+        </div>
+        <input type="hidden" id="projectuid" name="projectuid" value="@Model.Item" />
+    </form>
+
+</div>
+
+
+    @*UPLOAD THING*@
+
+
+    <div id="body">
+        <form name="form1" id="form1" method="post" action="/api/projects/upload/74305CE0-27B2-4B31-ACE1-35BBFA72551F" enctype="multipart/form-data" class="hidden">
+            <div>
+                <label>
+                    Browse File
+                </label>
+                <input name="myFile" type="file" />
+            </div>
+            <div>
+                <input type="submit" value="Upload" />
+            </div>
+        </form>
+    </div>
+
+
+    @section scripts {
+
+
+        <script type="text/javascript" src="~/Scripts/sabio.services.projects.js"></script>
+        <script type="text/javascript">
+
+
+            /******* Startup Function *******/
+
+            sabio.page.startUp = function () {
+
+                sabio.page.validateRules();     // Rules Validation call
+                $("#submissionButton").on("click", sabio.page.handlers.onSubmitButton); // Action that happens when you click button
+                var myUid = $("#projectuid").val();     // Uid's extraction from hiddden
+
+                if (myUid.length > 0) {     // IF statement with condition (myUid.length > 0) to check if there's an uid
+                    sabio.services.projects.get(myUid, sabio.page.onAjaxGetSuccess, sabio.page.onAjaxGetError);
+                    $("#form1").removeClass("hidden");
+                }
+            }
+
+            /******* Rules Validation *******/
+
+            //sabio.page.validateRules = function () {
+
+            //    $("#formCreateProject").validate({
+            //        rules:
+            //            {
+            //                name: {
+            //                    required: true,
+            //                    minlength: 2,
+            //                    maxlength: 100
+            //                },
+            //                url: {
+            //                    required: true,
+            //                    url: true
+            //                },
+            //                image: {
+            //                    required: false
+            //                },
+            //                description: {
+            //                    required: true,
+            //                    minlength: 20,
+            //                    maxlength: 100
+            //                },
+            //                launchdate: {
+            //                    required: true
+            //                }
+            //            }
+            //    });
+            //}
+
+
+            /******* GET Functions (Success/Error) *******/
+
+            //sabio.page.onAjaxGetSuccess = function (data, status, xhr) {
+
+            //    console.log(data);
+
+            //    // Grabbing all the values associate them with the id
+
+            //    $("#name").val(data.item.name);
+            //    $("#url").val(data.item.url);
+            //    $("#image").val(data.item.image);
+            //    $("#description").val(data.item.description);
+            //    $("#launchdate").val(data.item.launchdate);
+            //    $("#technologies").val(data.item.technologies);
+
+            //    var myUid = $("#projectuid").val();
+            //    $("#submissionButton").html('Update');  // Switch button text from Submit to Update
+            //    sabio.page.isInEditMode = true; // Sets a boolean
+
+            //}
+
+            //sabio.page.onAjaxGetError = function (jqXHR, textStatus, errorThrown) {
+
+            //    window.alert("Wow, wow, wow !!! I think there's an error.");
+
+            //}
+
+            /****************************** H A N D L E R S ******************************/
+
+
+            /******* Button Handler *******/
+
+            sabio.page.handlers.onSubmitButton = function (event) {
+
+                event.preventDefault();  //default action of the event will not be triggered
+                var isFormValid = $("#formCreateProject").valid();  // variable with assigned value that checks whether the selected form is valid or whether all selected elements are valid
+                if (isFormValid) {
+                    var formData = $("#formCreateProject").serialize(); //puts all the data in a string in the variable we declare
+                    if (sabio.page.isInEditMode) {
+                        var myUid = $("#projectuid").val();
+
+                        sabio.services.projects.update(myUid, formData, sabio.page.handlers.onAjaxUpdateSuccess, sabio.page.handlers.onAjaxUpdateError);
+                    }
+                    else {
+                        sabio.services.projects.create(formData, sabio.page.handlers.onAjaxCreateSuccess, sabio.page.handlers.onAjaxCreateError);
+                    }
+                }
+            }
+
+            /******* CREATE Success Handler *******/
+
+            //sabio.page.handlers.onAjaxCreateSuccess = function (data, status, xhr) {
+
+            //    console.log(data);
+            //    console.log(status);
+            //    console.log(xhr);
+            //    window.alert("Creation was successful, good job !!!");
+            //    $("#projectuid").val(data.item);
+            //    sabio.page.isInEditMode = true;
+            //    $("#submissionButton").html('Update');
+
+            //}
+
+            /******* CREATE Error Handler *******/
+
+            //sabio.page.handlers.onAjaxCreateError = function (jqXHR, textStatus, errorThrown) {
+
+            //    console.log(jqXHR);
+            //    console.log(textStatus);
+            //    console.log(errorThrown);
+            //    window.alert("Sorry creation didn't work, try it again !!!");
+
+            //}
+
+            /******* UPDATE Success Handler *******/
+
+            //sabio.page.handlers.onAjaxUpdateSuccess = function (data, status, xhr) {
+
+            //    console.log(data);
+            //    console.log(status);
+            //    console.log(xhr);
+            //    window.alert("Update went smooth !!!");
+
+            //}
+
+            /******* UPDATE Error Handler *******/
+
+            //sabio.page.handlers.onAjaxUpdateError = function (jqXHR, textStatus, errorThrown) {
+
+            //    console.log(jqXHR);
+            //    console.log(textStatus);
+            //    console.log(errorThrown);
+            //    window.alert("No update for you today !!!");
+
+            //}
+
+
+            /******* UPLOAD Success Handler *******/
+
+            //sabio.page.handlers.onAjaxUploadSuccess = function (data, status, xhr) {
+
+            //    console.log(data);
+            //    console.log(status);
+            //    console.log(xhr);
+            //    window.alert("Uploading on its way !!!");
+
+            //}
+
+
+            /******* UPLOAD Error Handler *******/
+
+            //sabio.page.handlers.onAjaxUploadError = function (jqXHR, textStatus, errorThrown) {
+
+            //    console.log(jqXHR);
+            //    console.log(textStatus);
+            //    console.log(errorThrown);
+            //    window.alert("Pffff, you better try better !!!");
+
+            //}
+
+
+ 
+
+            /*********************   ANGULAR   *********************/
+
+            sabio.services.projects.Factory = function ($baseService) {           
+
+                var angularServiceObject = sabio.services.projects;
+
+                var newService = $.extend(true, {}, angularServiceObject, $baseService);
+
+                return newService
+
+            }
+
+            sabio.page.createProjectsControllerFactory = function (
+               $scope,
+               $baseController,
+               $ProjectService) {
+
+                var vm = this;
+                vm.items = null;
+                vm.$ProjectService = $ProjectService;
+                vm.endPoint = "";
+
+                vm.receiveItems = _receiveItems;                        //on success
+                vm.onUsersError = _onUsersError;                        //on error
+                vm.submissionbutton = _submissionbutton;
+
+
+
+                // used for inheritance, like the AdminApiController : ApiController
+                $.extend(vm, $baseController);
+
+                    vm.notify = vm.$ProjectService.getNotifier($scope);
+
+                    render();
+
+                    function render() {
+
+                        vm.$ProjectService.create(vm.data, vm.receiveItems, vm.onUsersError);  //sabio.services.projects.create
+                    }
+
+                    function _receiveItems(data) {
+
+                        vm.notify(function () {
+                            vm.items = data.items;
+                        });
+                    }
+
+
+                    function _onUsersError(jqXhr, error) {
+
+                        console.error(error);
+
+                    }
+
+                    function _submissionbutton() {
+
+                        ;
+
+                    }
+
+                }
+
+
+            sabio.ng.addService(
+                sabio.ng.app.module,
+                "$ProjectService",
+                ["$baseService"],
+                sabio.services.projects.Factory);
+
+
+            sabio.ng.addController(
+                sabio.ng.app.module,
+                "createProjectsController",
+                ['$scope', '$baseController', "$ProjectService"],
+                sabio.page.createProjectsControllerFactory);
+
+
+
+            /*********************   END OF ANGULAR   *********************/
+
+
+
+        </script>
+    }
